@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Israel Evangelist — ToI Blog Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EAF3FC;
+    --panel: #FFFFFF;
+    --ink: #14213D;
+    --ink-soft: #4A5A72;
+    --blue: #1E5AA8;
+    --blue-deep: #0D3B78;
+    --blue-light: #4A90D9;
+    --sand: #1E5AA8;
+    --sand-soft: #DCEBFA;
+    --line: #C9DDF2;
+    --red: #C0392B;
+    --green: #2E8B57;
+    --amber: #B7791F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'DM Mono', monospace;
+    font-weight:400;
+    line-height:1.6;
+    font-size:16px;
+  }
+  header{
+    padding:32px 32px 24px;
+    border-bottom:3px solid var(--blue-deep);
+    background: linear-gradient(180deg, #fff, var(--bg));
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  header h1{
+    margin:0;
+    font-size:32px;
+    letter-spacing:0.5px;
+    color:var(--blue-deep);
+  }
+  header h1 span{ color:var(--blue); }
+  .version-badge{
+    font-size:14px;
+    color:var(--blue);
+    background:var(--sand-soft);
+    border:1px solid var(--line);
+    padding:3px 10px;
+    border-radius:12px;
+    font-weight:500;
+  }
+  header p{
+    margin:8px 0 0;
+    color:var(--ink-soft);
+    font-size:16px;
+    width:100%;
+  }
+  main{
+    max-width:960px;
+    margin:0 auto;
+    padding:28px 20px 90px;
+    display:grid;
+    gap:22px;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:24px;
+  }
+  .panel h2{
+    margin:0 0 16px;
+    font-size:18px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--blue);
+    border-bottom:2px solid var(--line);
+    padding-bottom:10px;
+  }
+  label{
+    display:block;
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+    margin-top:16px;
+    font-weight:500;
+  }
+  label:first-of-type{ margin-top:0; }
+  input[type=text], input[type=password], textarea, select{
+    width:100%;
+    font-family:'DM Mono', monospace;
+    font-size:16px;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:4px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--blue);
+  }
+  textarea{ min-height:90px; resize:vertical; }
+  .row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .cat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:8px;
+  }
+  .cat-btn{
+    border:1.5px solid var(--line);
+    background:#fff;
+    padding:16px 14px;
+    border-radius:5px;
+    cursor:pointer;
+    font-family:'DM Mono', monospace;
+    font-size:15px;
+    text-align:left;
+    color:var(--ink);
+  }
+  .cat-btn .name{ font-weight:600; color:var(--blue-deep); display:block; margin-bottom:5px; font-size:16px; }
+  .cat-btn .desc{ color:var(--ink-soft); font-size:14px; }
+  .cat-btn.active{ border-color:var(--blue); background:var(--sand-soft); border-width:2px; }
+  .btn{
+    font-family:'DM Mono', monospace;
+    font-size:16px;
+    padding:13px 22px;
+    border-radius:4px;
+    border:1.5px solid var(--blue-deep);
+    background:var(--blue-deep);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn.secondary{
+    background:#fff;
+    color:var(--blue-deep);
+  }
+  .btn:disabled{ opacity:0.5; cursor:default; }
+  .btn-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+  .output-title{
+    font-size:24px;
+    font-weight:600;
+    color:var(--blue-deep);
+    margin:0 0 16px;
+    padding-bottom:14px;
+    border-bottom:3px solid var(--blue-light);
+  }
+  .output-body p{ margin:0 0 16px; font-size:17px; }
+  .meta-bar{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1.5px solid var(--line);
+  }
+  .status{ font-size:15px; color:var(--ink-soft); margin-top:12px; min-height:18px; }
+  .status.err{ color:var(--red); }
+  .status.ok{ color:var(--green); }
+  .review{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1.5px dashed var(--line);
+    font-size:15px;
+  }
+  .review .score{ display:inline-block; padding:3px 10px; border-radius:4px; font-weight:600; margin-right:8px; font-size:14px; }
+  .score.STRONG{ background:#DDEFE1; color:var(--green); }
+  .score.WORK{ background:#F5E9D2; color:var(--amber); }
+  .score.WEAK{ background:#F3DDD6; color:var(--red); }
+  .history-item{
+    padding:12px 0;
+    border-bottom:1.5px solid var(--line);
+    cursor:pointer;
+    font-size:15px;
+  }
+  .history-item:hover{ color:var(--blue); }
+  .history-item .h-title{ font-weight:600; }
+  .history-item .h-meta{ color:var(--ink-soft); font-size:13px; }
+  details summary{ cursor:pointer; font-size:15px; color:var(--blue); }
+  .hint{ font-size:14px; color:var(--ink-soft); margin-top:4px; }
+  ::placeholder{ color:#9FB6D4; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Israel <span>Evangelist</span></h1>
+  <span class="version-badge" id="versionBadge">v1</span>
+  <p>Times of Israel blog post generator — Aliyah life, defending Israel, and everything in between.</p>
+</header>
+
+<main>
+
+  <div class="panel">
+    <h2>Settings</h2>
+    <div class="row">
+      <div>
+        <label for="workerUrl">Worker URL</label>
+        <input type="text" id="workerUrl" placeholder="https://leblog.keith-0ff.workers.dev">
+      </div>
+      <div>
+        <label for="notionDb">Notion database ID</label>
+        <input type="text" id="notionDb" placeholder="new database for ToI posts">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="anthropicKey">Anthropic API key</label>
+        <input type="password" id="anthropicKey" placeholder="sk-ant-...">
+      </div>
+      <div>
+        <label for="notionToken">Notion integration token</label>
+        <input type="password" id="notionToken" placeholder="ntn_...">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" id="saveSettings">Save settings</button>
+      <button class="btn secondary" id="testConnection">Test connection</button>
+    </div>
+    <div class="status" id="settingsStatus"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Category</h2>
+    <div class="cat-grid" id="catGrid"></div>
+
+    <label for="topicInput">Topic or angle (optional — leave blank and I'll pick something in this category)</label>
+    <textarea id="topicInput" placeholder="e.g. the siren went off during my daughter's bat mitzvah rehearsal, or: rebut the claim that the blockade is collective punishment"></textarea>
+
+    <label for="toneSelect">Register</label>
+    <select id="toneSelect">
+      <option value="auto">Auto (let the category decide)</option>
+      <option value="warm">Warm / funny</option>
+      <option value="reflective">Serious / reflective</option>
+      <option value="defense">Historical-comparison defense</option>
+    </select>
+
+    <div class="btn-row">
+      <button class="btn" id="generateBtn">Generate post</button>
+    </div>
+    <div class="status" id="genStatus"></div>
+  </div>
+
+  <div class="panel" id="outputPanel" style="display:none;">
+    <h2>Draft</h2>
+    <div id="outputTitle" class="output-title"></div>
+    <div id="outputBody" class="output-body"></div>
+    <div class="meta-bar">
+      <span id="wordCount"></span>
+      <span id="catLabel"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" id="copyBtn">Copy post</button>
+      <button class="btn secondary" id="saveNotionBtn">Save to Notion</button>
+      <button class="btn secondary" id="reviewBtn">Review draft</button>
+      <button class="btn secondary" id="regenBtn">Regenerate</button>
+      <button class="btn secondary" id="downloadBtn">Download .txt</button>
+    </div>
+    <div id="reviewOutput" class="review" style="display:none;"></div>
+  </div>
+
+  <div class="panel">
+    <h2>History</h2>
+    <div id="historyList"><p class="hint">Posts you generate are saved to Notion automatically when you copy or download them. Loaded posts appear here.</p></div>
+    <div class="btn-row">
+      <button class="btn secondary" id="loadHistory">Load from Notion</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const APP_VERSION = 'v7';
+
+const CATEGORIES = {
+  aliyah: {
+    name: "Aliyah Life",
+    desc: "Daily life in Israel, what actually surprises you",
+    defaultTone: "warm"
+  },
+  defense: {
+    name: "Defending Israel",
+    desc: "Rebutting propaganda, explaining military actions",
+    defaultTone: "defense"
+  },
+  identity: {
+    name: "Identity & Community",
+    desc: "Antisemitism, diaspora vs Israel, belonging",
+    defaultTone: "reflective"
+  },
+  holidays: {
+    name: "Holidays & Culture",
+    desc: "Seasonal pieces, humor, Israeli culture",
+    defaultTone: "warm"
+  }
+};
+
+let state = {
+  category: "aliyah",
+  lastDraft: null
+};
+
+// ---------- Settings ----------
+function loadSettings(){
+  ['workerUrl','notionDb','anthropicKey','notionToken'].forEach(id=>{
+    const v = localStorage.getItem('toi_'+id);
+    if(v) document.getElementById(id).value = v;
+  });
+  if(!document.getElementById('workerUrl').value){
+    document.getElementById('workerUrl').value = 'https://leblog.keith-0ff.workers.dev';
+  }
+}
+function saveSettings(){
+  ['workerUrl','notionDb','anthropicKey','notionToken'].forEach(id=>{
+    localStorage.setItem('toi_'+id, document.getElementById(id).value.trim());
+  });
+  setStatus('settingsStatus', 'Saved.', 'ok');
+}
+function getSettings(){
+  return {
+    workerUrl: document.getElementById('workerUrl').value.trim().replace(/\/$/,''),
+    notionDb: document.getElementById('notionDb').value.trim(),
+    anthropicKey: document.getElementById('anthropicKey').value.trim(),
+    notionToken: document.getElementById('notionToken').value.trim()
+  };
+}
+function setStatus(id, msg, kind){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status' + (kind ? ' '+kind : '');
+}
+
+async function testConnection(){
+  const s = getSettings();
+  if(!s.workerUrl || !s.anthropicKey){
+    setStatus('settingsStatus','Need at least a worker URL and Anthropic key.','err');
+    return;
+  }
+  setStatus('settingsStatus','Testing...','');
+  try{
+    const res = await fetch(s.workerUrl + '/anthropic', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key': s.anthropicKey},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens: 20,
+        messages:[{role:'user', content:'Reply with OK'}]
+      })
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    setStatus('settingsStatus','Connection works.','ok');
+  }catch(e){
+    setStatus('settingsStatus','Failed: '+e.message,'err');
+  }
+}
+
+// ---------- Category UI ----------
+function renderCategories(){
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = '';
+  Object.entries(CATEGORIES).forEach(([key,cat])=>{
+    const btn = document.createElement('div');
+    btn.className = 'cat-btn' + (key===state.category ? ' active' : '');
+    btn.innerHTML = `<span class="name">${cat.name}</span><span class="desc">${cat.desc}</span>`;
+    btn.onclick = ()=>{ state.category = key; renderCategories(); };
+    grid.appendChild(btn);
+  });
+}
+
+// ---------- System prompt ----------
+function buildSystemPrompt(category, tone){
+  const cat = CATEGORIES[category];
+  const effectiveTone = tone === 'auto' ? cat.defaultTone : tone;
+
+  const EXAMPLE_WARM = `Title: Aliyah, The Pinball Journey of a Lifetime
+
+Last week was our 7th anniversary of making Aliyah. I have used many metaphors to describe Aliyah to people I know worldwide, but the best one was from my friend Shmueli who said it best.
+
+Aliyah is like playing pinball. Let me explain.
+
+Once upon a time, you had an idea, you wanted to go live in Israel.
+
+Perhaps the idea came from your family, school, shul, or youth group if you are under 35 or so, and if you are over 40, it may have to do with various wars and events over the first 40-50 years of the country's existence that made you realize what an outcast you feel when you are in France, UK, US, Canada or wherever.
+
+Maybe you got hooked when you spent a year in Yeshiva, maybe it was a girl/boy friend or the food, whatever it was, you got hooked, and the only thing to do was give in to your desires.
+
+Ah, but leaving your home, your country, and going to another one is not quite as easy as swapping a lease car every two years.
+
+This one affects you and your family in many ways and influences your views on politics (and voting, because you know we have like 40 parties), religion (good, bad, different, new, old, none, all), fashion (shirt sleeve length, skirt lengths, piercings, tattoos, sandals with or without socks, for the record, I don't wear sandals, ever), food (kosher but which hashgacha, pareve is not always pareve if the teuda says meat, which butcher and then you get shmitta and orla), and vacations (Eilat for a few days, or is it cheaper to go to Cyprus or Greece for a week?).
+
+What does any of this have to do with pinball, those of you fans of the silver ball are asking yourselves?
+
+You see, pinball games start with a coin. So you need a credit to play, just like that spark of an idea in your head that begins the whole journey.
+
+Once you are committed to making Aliyah, your journey begins. It is the common way for some, just like pinball of old, a long launch up the right side, and then the ball drops into the playfield. But, sometimes, your Aliyah journey can be very different from everyone else's, just like some new pinball machines that launch the ball about a third of the way up the right side right into the middle of the playfield, quick and fast, and get ready for a wild ride.
+
+Yes, that may be your experience or something completely different. Just like pinball, where every game is different, no game is ever exactly the same. Everyone's Aliyah experience is unique and individual, even within your own family.
+
+Some will take their time to get around to everything, some will jump right in, some will end up living next door to the Prime Minister or the CEO of a growing company, others will not be so lucky.
+
+Luck does play a part in Aliyah. But, like Pinball, it is not all skill to achieve high scores, great salaries, or living accommodations.
+
+Once you get to Israel, you are then adrift at sea, so to speak, with the shuk masses. You feel yourself being bounced around from place to place to get various documents signed, sealed, and delivered (hint, don't use the Doar Israel to mail anything important with a deadline), just like how the pinball bounces among the popup bumpers found commonly on the playfield.
+
+By now, you also realize your Tanach Hebrew is not so helpful in modern times. It is like the people speak a different language here. Well, they do. How's your Russian, French, or Yiddish? Hopefully, I have not lost you on any pinball terms.
+
+You rack up personal points and goals by going shopping the first time to a supermarket where everything is kosher, and you don't need to check the label. Like how you try to hit all the drop targets and ramps in the pinball game to achieve some personal best high score.
+
+Of course, you also go to the fish or butcher area of the store and then quickly get flustered by the meat numbering system or the names of the fish. Well, you can't always get the big prize every day, just like missing the 5th left ramp shot you needed for an extra ball.
+
+And like in pinball, you will have days where your emotions go up and down, your frustration with the game, sorry, day-to-day life, gets to you, but there are those flippers to help put your ball back into play.
+
+What are the Aliyah flippers in real life? Your friends, your neighbors, your shul, sometimes your kids, sometimes the falafel guy giving you a free ball to taste while you are in line, and he has a fresh bin of them. The little things here give people the boost in confidence, well maybe not as much as a shot of tequila, but you know after you think the world is all wrong, and something good comes your way, many of us say, "only in Israel," and it is true.
+
+Of course, like pinball, when the ball drains, and you need to start a new ball, we have some events that cause us to stop and regroup. Maybe it is rockets from the South or from the North, maybe it is a strike at the airport, maybe it is gas price changes, or maybe it is a pandemic that no one could foresee, and we all just have to wing it best we can. Baruch Hashem, liquor stores and supermarkets deliver.
+
+You take these and learn from them for next time, so you don't get stuck in your underwear in the bomb shelter. And you pull the plunger back and launch the next ball, because that crazy British "stiff upper lip" thing evidently is ingrained here in spades, so you get up and do it all over again the next day.
+
+Addicting it is, but also, like pinball, not for everyone. Some people tilt the game, which means they caused everything to stop and lose their turn, which can be very frustrating. Maybe they were not open in their journey, or maybe they ran into problems that pushed them the wrong way, and it put them off from staying. They still get to start a new ball and try again, but some people can't let go of the past to see the future.
+
+When you finally finish your pinball game, if you played well, you get to add your name or initials to the leader board. If not, you try, try again.
+
+Aliyah never finishes, it is just a long journey, and you leave your mark everywhere you go, and every experience you have here helps you eventually find your comfort zone.
+
+Soon you start speaking Heblish and forgetting the English words you wanted to say. You may change jobs entirely or start your 2nd, 3rd, or 4th side gig because Startup Nation eventually gets into everyone's head.
+
+You see new games, new journeys, new outcomes for you and your family, who in turn will see new directions as well, not always as you expect or can imagine.
+
+All because you had the idea to make Aliyah and started playing the game.
+
+Welcome to all the new olim! And for those who are thinking about it, it is never too late to do what makes you happy.`;
+
+  const EXAMPLE_DEFENSE = `Title: Jets Overhead
+
+We live near an Air Force base. My daughter's school is practically beneath the runway, so the students hear the planes coming and going.
+
+We hear and see them, too, sometimes close enough to see the undercarriage and read their call numbers.
+
+Why do I bring this up? Most people in the US have never experienced this, and I want to describe it because it is not what you think.
+
+It is not the same as being in the flight path of your local airport, even if that airport is Heathrow, where the Concorde flew, although that was the closest thing that compares. I know; I used to work near there.
+
+The engine roar, especially when it is heading out, is thunderous, window-rattling, and high decibel, while the ones returning are closer to regular airplane sounds.
+
+On the ground, we know that the men and women pilots are up there doing their jobs to protect us, their families, and friends.
+
+They are following orders, often stringent ones, about their missions. It doesn't mean innocent people won't get hurt. Even when hitting the target, shrapnel has a mind of its own, and that price is one that we have to live with because, let's be honest, it means that the mission is to prevent more rockets from being launched at our people or other insidious things from occurring.
+
+People in the US have not needed this type of preventative maintenance locally since 9/11; even then, it was not coming to the US but going to where it started in Afghanistan. Before 9/11, maybe the Cuban missile crisis was the previous time; before that, it was World War II and Pearl Harbor.
+
+It is easy to armchair quarterback the war. Israelis do it as much as anyone else. And while you will see demonstrations against the prime minister, and some of the reasons for it are valid, to argue against the military aspects of what is happening is minimal, especially lately.
+
+Early on, we all wanted more done; we wanted the hostages found and brought back, and we still do. But to be myopic and think Gaza was the only problem is, as we say here, rosh katan (small head/thinking) of you.
+
+In the past, before October 7, if we heard a jet on Shabbat, we knew something was wrong somewhere. If we heard many jets, we knew something was really bad.
+
+Since then, we have had various numbers of jets flying daily, and on Shabbat a few weeks back (when we hit the Houthis), we heard the planes leave. There were many of them, but we only found out later what that mission was. And this is where you may disagree, but it was a typical Middle East reply. An eye for an eye, so to speak.
+
+If you think the war in the Ukraine or here will be solved by Western thinking, I can't help you. As a rational-thinking person, I agree there must be a better way. However, after doing business across South America, the US, Europe, and Russia, I can tell you it is not that easy.
+
+Sweden, Finland, and other countries are constantly on the lookout for movement from Russia because they know what can happen, sometimes quickly, as Ukraine found out. Don't forget that Ukraine sniffed something terrible coming and was training and supplying the country before Russia invaded. It would have been overrun long ago if it had stuck to Western thinking.
+
+While we try to be in talks to help release the hostages, we also have to fight the battles every day, while waiting. Our jets are reminding the people of Gaza that their lives, like the lives of our hostages, are in perilous danger, and they should do whatever they can to return the hostages. After 11 months, however, it is obvious the people of Gaza have no interest in helping to return our hostages.
+
+Those jets overhead are doing their job. They return and do the next run. They also serve as a beacon of hope to the hostages who know the jets are ours and are looking for them.
+
+But our enemies are many and driven by their ideals, which obviously do not include Western thinking but are still locked into the Middle East way.
+
+Should we not use any possible method to protect ourselves? If it were your family, friends, and fellow citizens that were being sent to bomb shelters perpetually up north and down south, would you get up and say, "We should talk to them and get them to stop this madness."
+
+No, you wouldn't. Most of you would be screaming to carpet bomb the crazy people trying to kill you and your people. But we see that is not how everyone sees this moment in time.
+
+When we see and hear our jets, we know our government and army are there for us. They are doing what we, the non-pilots and non-army people, would be doing if we could.
+
+Once upon a time, everyone loved the three musketeers and their "all for one, one for all" attitude. But nowadays, the world seems to feel the opposite, "all for me, me for no one."
+
+Some people argue that it is an imbalanced war because we have jets, while Gaza and Lebanon do not. They both have other methods at their disposal that we do not. Nothing is fair in war.
+
+Friends and family in the US ask what it is like here right now. The answer depends on where you live.
+
+Up north, meaning from Haifa across to Tiberias, Tzfat, and the Galil, they have been under attack for the last two weeks. People even further north, from Kiryat Shemona to the Golan and many other places, were already displaced months ago because of the situation.
+
+Down south, people still can't return to their homes near the Gaza area.
+
+Relatively speaking, where I live in Rehovot, it has been quieter, especially since the majority of the rockets from Gaza were minimized and eventually almost stopped. Somehow, they still have the ability to send some rockets to us, but those do not leave their area.
+
+Our daily lives have not had to change as much as others, and that, on the one hand, sounds crazy, but is also not very comforting. However, that can change at any time, like when we were woken up last week by an inbound missile.
+
+As long as the jets keep flying, we know what to expect. We hope and pray they finish their missions completely and none is lost during those missions.
+
+It would be nice to believe there will come a time when we do not need our jets, but given the way the world has chosen to react to us since October 7, I am betting we will have jets for many years to come because, just like in the comics, villains never really die. They always come back somehow.`;
+
+  const EXAMPLE_REFLECTIVE = `Title: You Will Be Assimilated, But Not Accepted
+
+Do you know why the world hates us? Why there is so much antisemitism? Why is it always Jews that are picked on or ridiculed?
+
+I know why.
+
+Over the years, as things have happened in various countries, many of us in Israel write on social media that everyone should come home to Israel. No, it is not a utopia, but it is the ONLY place on Earth you can live without harassment from racist, antisemitic, anti-Zionist people who hate you.
+
+My friends in the US and UK quickly respond that running away is not the answer. They misunderstand where we are coming from. It is not running away from a situation. It is saving your life.
+
+You see, they want you to stay for the following reasons: they think you should work to find a peaceful solution, and it never involves them, so they have no idea this is not a negotiating situation. They love their country and don't understand why you don't. It helps the Jews who say this feel better about themselves, because it makes them complicit in their own guilt about staying in their comfortable lives when you agree and remain. It helps keep Israel from getting any stronger. And some of them, Jews and non-Jews alike, want us assimilated.
+
+We buy into their world if they convince us to stay in their country. We adopt their customs, give up our religion, intermarry with them, and give them the benefit of our minds and money. But that path, as we are seeing in spades now and have been for years, is filled with falsehoods, and they will still come for you only because you are Jewish.
+
+And what do we, as Jews, get out of it? Nothing comes to mind, but if you like lynch mobs, your children getting attacked on campuses across America, and people who you thought were your coworkers and friends now openly saying they want to kill you, well, I guess that may work for some of you.
+
+If you are not standing up to them and asking how they can say we staged everything on Oct 7 and how they are worried about the people of Gaza but not about what the terrorists did to your people, then you are lost to us as a people.
+
+I am not saying you should be religious. It takes people with conviction, strength of character, and personality to take the road less traveled. It is easy not to be religious, but do you think the people demonstrating in your cities care if you eat bacon or not when they want to find some Jews to pick on?
+
+People have been pulling their mezuzahs off their door frames. Don't they understand where that comes from? And what it means? Evidently not.
+
+Again, you could come to Israel because, like I said, it is about saving your life. The Talmud (Sanhedrin 37a) says: "Whoever saves a single life is considered by scripture to have saved the whole world." We are trying to save your lives, as well as our own.
+
+But you won't listen to us. Life is too good in the US, UK, or Europe, and you would rather your countrymen see you as a decent law-abiding citizen. I have news for you. They. Don't. Give. A. F.
+
+You can only bribe your way out of problems so many times. Eventually, those demonstrations will come down your street in your neighborhood. And you can stick your head in the dirt, or you can face reality.
+
+So, will you be assimilated? Never enough for them. And this is why the world hates Jews. We don't assimilate.
+
+No matter which country throughout history Jews have lived in, we have always had our ways, our areas, sometimes by choice, other times forced upon us by legal measures. We don't dress the same way as everyone else. We retain our religion in whatever shape or form. We have our traditions, our food, our shabbat. We don't put any of this in front of everyone, but when they see it or experience it, all they can think of is we are outsiders.
+
+We are Jewish/Israeli first and American/European second. Always.
+
+History has proven to us repeatedly that we will never be accepted in any country, no matter how long we are there. Thus, our loyalties are only to God above and our fellow Jews, even those of you who are self-hating Jews, because the mobs will still come for you too.`;
+
+  const example = effectiveTone === 'warm' ? EXAMPLE_WARM : effectiveTone === 'reflective' ? EXAMPLE_REFLECTIVE : EXAMPLE_DEFENSE;
+
+  return `You are ghostwriting a personal blog post for Keith Brooks's Times of Israel blog (blogs.timesofisrael.com).
+
+WHO KEITH IS
+Keith made Aliyah in 2014 with his wife, 3 kids, and dog. He lives in Rehovot, Israel, near an Air Force base. He is an enterprise IT/AI strategy advisor by trade, but this blog is personal and advocacy writing, not professional content. He writes about what it is actually like to live in Israel, and he defends Israel against propaganda from Palestinian and Iranian regimes when the moment calls for it.
+
+AUDIENCE
+Diaspora readers, pro-Israel readers, and people genuinely curious about Israeli life who do not understand what daily life there is actually like. Write to bridge that gap, not to preach to people who already agree.
+
+CATEGORY FOR THIS POST: ${cat.name} (${cat.desc})
+REGISTER: ${effectiveTone === 'warm' ? 'Warm and often funny, even when the underlying topic has weight.' : effectiveTone === 'reflective' ? "Serious and direct, willing to be blunt and confrontational rather than gentle, especially when addressing diaspora Jews' choices or assumptions. A numbered or listed breakdown of reasons is fine when it fits the argument. Short staccato sentences or even single-word sentence fragments are fine for emphasis at a key moment. Cite a Talmudic or biblical source where it strengthens the point. It's fine to end on a stark, unresolved, or challenging note rather than a comforting one." : "Serious, defending a position under attack, and willing to be blunt and confrontational, not just explanatory. Use rapid comparative facts and death-toll statistics to expose double standards (how the world reacted, or didn't, to other conflicts) and a barrage of short rhetorical questions the reader can't easily dismiss. Cite historical parallels (Allied bombing of Germany, Hiroshima and Nagasaki, the Gulf War, the War on Terror) and, where relevant, religious or textual sources (Torah, Talmud) to back the argument. Do not soften criticism of specific institutions or commentators when they've earned it. Unapologetic about Israel's right to defend itself. It's fine to end on a blunt statement of resolve or a prayer for soldiers' safety rather than a gentle reflective note."}
+
+VOICE RULES (hard requirements)
+- Full connected paragraphs, never fragments or bullet lists. Conversational but not casual.
+- Address the reader directly at least once, especially readers outside Israel who don't understand what life there is actually like.
+- Bridge the gap with comparisons to American/Western experience where it helps ("People in the US have not needed this type of preventative maintenance locally since 9/11").
+- Ask a rhetorical question at least once, then answer it directly yourself ("Why do I bring this up?").
+- Use Hebrew words naturally with a brief parenthetical translation, e.g. "rosh katan (small head/thinking)". Do not overdo this — one or two per post is plenty.
+- Ground the post in real personal geography when it fits naturally: Rehovot, the Air Force base nearby, his daughter's school near the runway, the Galil, Kiryat Shemona. Never force these in if they don't fit the topic.
+- End with a reflective statement or a plain moral. Never end with a call to action, a summary, or "in conclusion."
+- No hashtags. No booking links. No CTA of any kind. This is personal and advocacy writing, not marketing.
+- Length: 600-1200 words. No hard character limit.
+- Never use em dashes. Use commas or parentheses for supplementary thoughts instead.
+
+BANNED CONSTRUCTIONS
+- Do not announce the topic before diving in ("In this post I want to talk about..."). Drop the reader into the situation or the thought already in progress.
+- Avoid generic op-ed filler: "The reality is," "At the end of the day," "It is a common misconception," "Nobody wants to say this out loud."
+- Do not summarize what you just said in the closing paragraph. Land on an image, a feeling, or a plain statement instead.
+
+EXAMPLE POST (voice reference — this is Keith's actual published writing; match its rhythm, structure, and register closely)
+---
+${example}
+---
+
+TASK
+Write one full blog post in this voice, in the category and register above. If a specific topic or angle is provided, ground the post in it. If none is provided, choose a specific, concrete angle within the category (a real-feeling scene or argument, not an abstract theme).
+
+Respond with ONLY a JSON object, no markdown fences, no preamble:
+{"title": "short title in Keith's voice", "post": "the full post body, paragraphs separated by \\n\\n"}`;
+}
+
+function buildCriticPrompt(){
+  return `You are a quiet editor reviewing a Times of Israel blog draft before it goes to Keith. You will receive a JSON draft with "title" and "post". Improve it against three criteria only:
+
+1. Clarity — will a diaspora reader who has never lived in Israel understand the context without more explanation?
+2. Grounding — is it anchored in a real-feeling scene or specific experience, not abstraction or generic argument?
+3. Voice — does it sound like Keith writing from Rehovot, personal and direct, not like a political op-ed or a press release?
+
+Fix weak sentences, tighten anything generic, remove any em dashes (replace with commas or parentheses), remove any CTA or hashtag if one slipped in, and make sure the ending lands on a reflective note rather than a summary. Keep the same topic and roughly the same length. Do not add a new topic.
+
+Respond with ONLY the corrected JSON object in the same shape: {"title": "...", "post": "..."}`;
+}
+
+// ---------- Generation ----------
+async function callAnthropic(system, userMsg, maxTokens){
+  const s = getSettings();
+  const res = await fetch(s.workerUrl + '/anthropic', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key': s.anthropicKey},
+    body: JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system: system,
+      messages:[{role:'user', content: userMsg}]
+    })
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error('API error '+res.status+': '+t.slice(0,200));
+  }
+  const data = await res.json();
+  const textBlock = (data.content||[]).find(b=>b.type==='text');
+  return textBlock ? textBlock.text : '';
+}
+
+function parseDraftJson(raw){
+  let cleaned = raw.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/```\s*$/,'');
+  try{
+    return JSON.parse(cleaned);
+  }catch(e){
+    return null;
+  }
+}
+
+async function generatePost(){
+  const s = getSettings();
+  if(!s.workerUrl || !s.anthropicKey){
+    setStatus('genStatus','Add your worker URL and Anthropic key in Settings first.','err');
+    return;
+  }
+  const topic = document.getElementById('topicInput').value.trim();
+  const tone = document.getElementById('toneSelect').value;
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  setStatus('genStatus','Writing draft...','');
+
+  try{
+    const system = buildSystemPrompt(state.category, tone);
+    const userMsg = topic
+      ? `Write the post. Topic/angle to ground it in: ${topic}`
+      : `Write the post. No specific topic given, choose a strong concrete angle within the category yourself.`;
+
+    let raw = await callAnthropic(system, userMsg, 4000);
+    let draft = parseDraftJson(raw);
+    if(!draft || !draft.post){
+      throw new Error('Could not parse a draft from the model response.');
+    }
+
+    setStatus('genStatus','Refining (silent editor pass)...','');
+    try{
+      const criticRaw = await callAnthropic(buildCriticPrompt(), JSON.stringify(draft), 4000);
+      const refined = parseDraftJson(criticRaw);
+      if(refined && refined.post && refined.post.length > 400){
+        draft = refined;
+      }
+    }catch(e){
+      // fall back silently to the writer draft
+    }
+
+    state.lastDraft = { ...draft, category: state.category, topic, tone, generatedAt: new Date().toISOString() };
+    renderDraft(state.lastDraft);
+    setStatus('genStatus','Draft ready.','ok');
+  }catch(e){
+    setStatus('genStatus','Error: '+e.message,'err');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function renderDraft(draft){
+  document.getElementById('outputPanel').style.display = 'block';
+  document.getElementById('outputTitle').textContent = draft.title || '(untitled)';
+  const body = document.getElementById('outputBody');
+  body.innerHTML = '';
+  (draft.post||'').split(/\n\n+/).forEach(p=>{
+    if(p.trim()){
+      const el = document.createElement('p');
+      el.textContent = p.trim();
+      body.appendChild(el);
+    }
+  });
+  const words = (draft.post||'').split(/\s+/).filter(Boolean).length;
+  document.getElementById('wordCount').textContent = words + ' words';
+  document.getElementById('catLabel').textContent = CATEGORIES[draft.category].name;
+  document.getElementById('reviewOutput').style.display = 'none';
+  document.getElementById('outputPanel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+async function copyPost(){
+  if(!state.lastDraft) return;
+  const text = state.lastDraft.title + '\n\n' + state.lastDraft.post;
+  try{
+    await navigator.clipboard.writeText(text);
+    setStatus('genStatus','Copied to clipboard. Saving to Notion...','');
+  }catch(e){
+    setStatus('genStatus','Could not copy to clipboard ('+e.message+'). Saving to Notion...','err');
+  }
+  await saveToNotion(state.lastDraft);
+}
+
+function downloadPost(){
+  if(!state.lastDraft) return;
+  const text = state.lastDraft.title + '\n\n' + state.lastDraft.post;
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = state.lastDraft.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase() + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  saveToNotion(state.lastDraft);
+}
+
+async function reviewDraft(){
+  if(!state.lastDraft) return;
+  const s = getSettings();
+  const btn = document.getElementById('reviewBtn');
+  btn.disabled = true;
+  setStatus('genStatus','Reviewing...','');
+  try{
+    const system = `You are reviewing a Times of Israel blog draft. Score it on three criteria only: Clarity (would a diaspora reader with no Israel context follow it), Grounding (is it anchored in a real-feeling specific experience, not abstraction), Voice (does it sound personal and direct, like Keith writing from Rehovot, not like an op-ed).
+
+For each criterion give a verdict of STRONG, WORK, or WEAK and one line of reasoning. Then give 2-3 specific line-level suggestions if anything falls short of STRONG. Respond with ONLY JSON, no markdown fences:
+{"clarity":{"verdict":"STRONG|WORK|WEAK","note":"..."},"grounding":{"verdict":"STRONG|WORK|WEAK","note":"..."},"voice":{"verdict":"STRONG|WORK|WEAK","note":"..."},"suggestions":["...","..."]}`;
+    const raw = await callAnthropic(system, JSON.stringify({title: state.lastDraft.title, post: state.lastDraft.post}), 1000);
+    const review = parseDraftJson(raw);
+    if(!review) throw new Error('Could not parse review.');
+    renderReview(review);
+    setStatus('genStatus','Review ready.','ok');
+  }catch(e){
+    setStatus('genStatus','Error: '+e.message,'err');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function renderReview(review){
+  const el = document.getElementById('reviewOutput');
+  el.style.display = 'block';
+  const badge = v => `<span class="score ${v==='STRONG'?'STRONG':v==='WEAK'?'WEAK':'WORK'}">${v}</span>`;
+  let html = '';
+  ['clarity','grounding','voice'].forEach(k=>{
+    if(review[k]){
+      html += `<div style="margin-bottom:8px;">${badge(review[k].verdict)} <strong>${k[0].toUpperCase()+k.slice(1)}</strong> — ${review[k].note}</div>`;
+    }
+  });
+  if(review.suggestions && review.suggestions.length){
+    html += '<div style="margin-top:8px;"><strong>Suggestions:</strong><ul style="margin:6px 0 0 18px; padding:0;">' +
+      review.suggestions.map(s=>`<li>${s}</li>`).join('') + '</ul></div>';
+  }
+  el.innerHTML = html;
+}
+
+// ---------- Notion ----------
+async function saveToNotion(draft){
+  const s = getSettings();
+  if(!s.notionToken || !s.notionDb){
+    setStatus('genStatus','Copied. (Notion not configured — add token + database ID in Settings to auto-save.)','');
+    return;
+  }
+  try{
+    const res = await fetch(s.workerUrl + '/notion', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-notion-token': s.notionToken,
+        'x-notion-path': 'pages'
+      },
+      body: JSON.stringify({
+        parent: { database_id: s.notionDb },
+        properties: {
+          "Name": { title: [{ text: { content: draft.title || 'Untitled' } }] },
+          "Category": { select: { name: CATEGORIES[draft.category].name } },
+          "Word Count": { number: (draft.post||'').split(/\s+/).filter(Boolean).length },
+          "Generated": { date: { start: draft.generatedAt } }
+        },
+        children: (draft.post||'').split(/\n\n+/).filter(p=>p.trim()).map(p=>({
+          object:'block', type:'paragraph',
+          paragraph:{ rich_text:[{ type:'text', text:{ content: p.trim().slice(0,2000) } }] }
+        }))
+      })
+    });
+    const data = await res.json();
+    if(!res.ok){
+      setStatus('genStatus','Saved locally, but Notion save failed: '+(data.message||res.status),'err');
+    }else{
+      setStatus('genStatus','Copied and saved to Notion.','ok');
+    }
+  }catch(e){
+    setStatus('genStatus','Copied locally, but Notion save failed: '+e.message,'err');
+  }
+}
+
+async function loadHistory(){
+  const s = getSettings();
+  const list = document.getElementById('historyList');
+  if(!s.notionToken || !s.notionDb){
+    list.innerHTML = '<p class="hint">Add your Notion token and database ID in Settings first.</p>';
+    return;
+  }
+  list.innerHTML = '<p class="hint">Loading...</p>';
+  try{
+    const res = await fetch(s.workerUrl + '/notion', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-notion-token': s.notionToken,
+        'x-notion-path': `databases/${s.notionDb}/query`,
+        'x-notion-method': 'POST'
+      },
+      body: JSON.stringify({ page_size: 20, sorts:[{timestamp:'created_time', direction:'descending'}] })
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(!data.results || !data.results.length){
+      list.innerHTML = '<p class="hint">No posts saved yet.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    data.results.forEach(page=>{
+      const title = page.properties?.Name?.title?.[0]?.plain_text || 'Untitled';
+      const cat = page.properties?.Category?.select?.name || '';
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `<div class="h-title">${title}</div><div class="h-meta">${cat}</div>`;
+      list.appendChild(div);
+    });
+  }catch(e){
+    list.innerHTML = `<p class="hint">Could not load history: ${e.message}</p>`;
+  }
+}
+
+// ---------- Wire up ----------
+document.getElementById('saveSettings').onclick = saveSettings;
+document.getElementById('testConnection').onclick = testConnection;
+document.getElementById('generateBtn').onclick = generatePost;
+document.getElementById('regenBtn').onclick = generatePost;
+document.getElementById('copyBtn').onclick = copyPost;
+document.getElementById('saveNotionBtn').onclick = ()=>{ if(state.lastDraft) saveToNotion(state.lastDraft); };
+document.getElementById('downloadBtn').onclick = downloadPost;
+document.getElementById('reviewBtn').onclick = reviewDraft;
+document.getElementById('loadHistory').onclick = loadHistory;
+document.getElementById('versionBadge').textContent = APP_VERSION;
+
+loadSettings();
+renderCategories();
+</script>
+
+</body>
+</html>
